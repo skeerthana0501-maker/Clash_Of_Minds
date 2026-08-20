@@ -1,0 +1,6 @@
+{
+  "name": "Clash of Minds",
+  "description": "Debate event platform with animated intro, General and Technical tracks, numbered topic selector, and stage timer.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
