@@ -1,16 +1,21 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Zap, Sparkles, ChevronRight, Volume2, VolumeX, Shield, Award, Flame } from 'lucide-react';
+import { Zap, Sparkles, ChevronRight, Volume2, VolumeX, Shield, Award, Flame, Trophy, Shuffle } from 'lucide-react';
+import { CategoryType } from '../types';
 import { soundManager } from '../utils/audio';
+import { CategoryRandomDrawModal } from './CategoryRandomDrawModal';
 
 interface IntroScreenProps {
   onEnter: () => void;
   isMuted: boolean;
   onToggleMute: () => void;
+  onOpenEvaluator?: () => void;
+  onRandomTrackSelect?: (category: CategoryType) => void;
 }
 
-export function IntroScreen({ onEnter, isMuted, onToggleMute }: IntroScreenProps) {
+export function IntroScreen({ onEnter, isMuted, onToggleMute, onOpenEvaluator, onRandomTrackSelect }: IntroScreenProps) {
   const [clashPulse, setClashPulse] = useState(0);
+  const [isRandomDrawOpen, setIsRandomDrawOpen] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -22,6 +27,11 @@ export function IntroScreen({ onEnter, isMuted, onToggleMute }: IntroScreenProps
   const handleEnterClick = () => {
     soundManager.playClashSound();
     onEnter();
+  };
+
+  const handleOpenRandomDraw = () => {
+    soundManager.playClick();
+    setIsRandomDrawOpen(true);
   };
 
   return (
@@ -41,7 +51,7 @@ export function IntroScreen({ onEnter, isMuted, onToggleMute }: IntroScreenProps
       />
 
       {/* Top Bar with Event Badge & Audio Toggle */}
-      <header className="relative z-20 w-full max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
+      <header className="relative z-20 w-full max-w-7xl mx-auto px-6 py-6 flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-3">
           <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/25 border border-cyan-400/30">
             <Zap className="w-5 h-5 text-white" />
@@ -52,7 +62,31 @@ export function IntroScreen({ onEnter, isMuted, onToggleMute }: IntroScreenProps
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
+          {onRandomTrackSelect && (
+            <button
+              onClick={handleOpenRandomDraw}
+              id="intro-random-draw-btn"
+              className="p-2.5 sm:px-3.5 rounded-xl bg-cyan-500/10 border border-cyan-500/30 hover:border-cyan-400/60 text-cyan-300 hover:text-cyan-200 transition-all shadow-md flex items-center gap-2 text-xs font-bold cursor-pointer"
+              title="Random Track Lottery (General vs Technical)"
+            >
+              <Shuffle className="w-4 h-4 text-cyan-400 animate-pulse" />
+              <span className="hidden sm:inline">Random Track Draw</span>
+            </button>
+          )}
+
+          {onOpenEvaluator && (
+            <button
+              onClick={onOpenEvaluator}
+              id="intro-evaluator-btn"
+              className="p-2.5 sm:px-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 hover:border-amber-400/60 text-amber-300 hover:text-amber-200 transition-all shadow-md flex items-center gap-2 text-xs font-bold cursor-pointer"
+              title="Best Speaker Evaluation Rubric (7 Criteria)"
+            >
+              <Trophy className="w-4 h-4 text-amber-400" />
+              <span className="hidden sm:inline">Best Speaker Rubric</span>
+            </button>
+          )}
+
           <button
             onClick={onToggleMute}
             className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-700/60 hover:border-slate-500 text-slate-300 hover:text-white transition-all shadow-md flex items-center gap-2 text-xs font-medium"
@@ -251,17 +285,17 @@ export function IntroScreen({ onEnter, isMuted, onToggleMute }: IntroScreenProps
           </div>
         </motion.div>
 
-        {/* ENTER ACTION BUTTON */}
+        {/* ENTER & RANDOM DRAW ACTION BUTTONS */}
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6, delay: 0.6 }}
-          className="mt-8 sm:mt-10"
+          className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center justify-center gap-4"
         >
           <button
             onClick={handleEnterClick}
             id="enter-arena-button"
-            className="group relative inline-flex items-center justify-center gap-3 px-8 sm:px-12 py-4 sm:py-5 rounded-2xl bg-gradient-to-r from-cyan-500 via-sky-500 to-amber-500 text-slate-950 text-base sm:text-lg font-extrabold tracking-wider uppercase transition-all duration-300 hover:scale-105 active:scale-95 shadow-[0_0_35px_rgba(14,165,233,0.5)] hover:shadow-[0_0_55px_rgba(245,158,11,0.7)] cursor-pointer"
+            className="group relative inline-flex items-center justify-center gap-3 px-8 sm:px-10 py-4 sm:py-4.5 rounded-2xl bg-gradient-to-r from-cyan-500 via-sky-500 to-amber-500 text-slate-950 text-base sm:text-lg font-extrabold tracking-wider uppercase transition-all duration-300 hover:scale-105 active:scale-95 shadow-[0_0_35px_rgba(14,165,233,0.5)] hover:shadow-[0_0_55px_rgba(245,158,11,0.7)] cursor-pointer"
           >
             {/* Glow ring */}
             <span className="absolute -inset-0.5 rounded-2xl bg-gradient-to-r from-cyan-400 to-amber-400 opacity-75 blur group-hover:opacity-100 transition duration-300" />
@@ -272,16 +306,40 @@ export function IntroScreen({ onEnter, isMuted, onToggleMute }: IntroScreenProps
               <ChevronRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
             </span>
           </button>
-          <p className="mt-3 text-xs text-slate-500 font-medium">
-            Press Enter to select your debate category & unlock numbers
-          </p>
+
+          {onRandomTrackSelect && (
+            <button
+              onClick={handleOpenRandomDraw}
+              id="intro-hero-random-draw-btn"
+              className="inline-flex items-center justify-center gap-2.5 px-6 py-4 rounded-2xl bg-slate-900/90 hover:bg-slate-800 border-2 border-cyan-500/40 hover:border-amber-400 text-slate-200 hover:text-white text-sm font-extrabold tracking-wider uppercase transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg shadow-cyan-950/40 cursor-pointer"
+            >
+              <Shuffle className="w-4 h-4 text-cyan-400 animate-pulse" />
+              <span>Random Track Draw</span>
+            </button>
+          )}
         </motion.div>
+        
+        <p className="mt-3 text-xs text-slate-500 font-medium">
+          Choose a track or use Random Draw to decide between General and Technical
+        </p>
       </main>
 
       {/* Footer Branding */}
       <footer className="relative z-10 w-full text-center py-4 border-t border-slate-900/80 text-xs text-slate-500">
         Clash of Minds Debate Platform • Dual-Track Motion Selector System
       </footer>
+
+      {/* Random Category Draw Modal */}
+      {onRandomTrackSelect && (
+        <CategoryRandomDrawModal
+          isOpen={isRandomDrawOpen}
+          onClose={() => setIsRandomDrawOpen(false)}
+          onSelectCategory={(chosen) => {
+            setIsRandomDrawOpen(false);
+            onRandomTrackSelect(chosen);
+          }}
+        />
+      )}
     </div>
   );
 }

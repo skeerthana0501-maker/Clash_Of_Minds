@@ -1,13 +1,16 @@
+import { useState } from 'react';
 import { motion } from 'motion/react';
-import { Globe2, Cpu, ArrowLeft, Sparkles, Zap, BookOpen, Layers, CheckCircle2 } from 'lucide-react';
+import { Globe2, Cpu, ArrowLeft, Sparkles, Zap, BookOpen, Layers, CheckCircle2, Trophy, Shuffle } from 'lucide-react';
 import { CategoryType } from '../types';
 import { soundManager } from '../utils/audio';
+import { CategoryRandomDrawModal } from './CategoryRandomDrawModal';
 
 interface CategorySelectProps {
   onSelectCategory: (cat: CategoryType) => void;
   onBack: () => void;
   generalUsedCount: number;
   technicalUsedCount: number;
+  onOpenEvaluator?: () => void;
 }
 
 export function CategorySelect({
@@ -15,10 +18,18 @@ export function CategorySelect({
   onBack,
   generalUsedCount,
   technicalUsedCount,
+  onOpenEvaluator,
 }: CategorySelectProps) {
+  const [isRandomDrawOpen, setIsRandomDrawOpen] = useState(false);
+
   const handleSelect = (category: CategoryType) => {
     soundManager.playClick();
     onSelectCategory(category);
+  };
+
+  const handleOpenRandomDraw = () => {
+    soundManager.playClick();
+    setIsRandomDrawOpen(true);
   };
 
   return (
@@ -29,7 +40,7 @@ export function CategorySelect({
       <div className="absolute bottom-1/4 right-10 w-96 h-96 bg-amber-600/10 rounded-full blur-3xl pointer-events-none" />
 
       {/* Top Navigation */}
-      <header className="relative z-10 w-full max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
+      <header className="relative z-10 w-full max-w-7xl mx-auto px-6 py-6 flex items-center justify-between flex-wrap gap-3">
         <button
           onClick={onBack}
           id="back-to-intro-btn"
@@ -39,19 +50,44 @@ export function CategorySelect({
           <span>Back to Intro</span>
         </button>
 
-        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-slate-400 bg-slate-900/60 px-3.5 py-1.5 rounded-full border border-slate-800">
-          <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-          <span>Track Selection Phase</span>
+        <div className="flex items-center gap-2.5">
+          {/* Random Track Draw Header Trigger */}
+          <button
+            onClick={handleOpenRandomDraw}
+            id="header-random-category-btn"
+            className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-cyan-500/15 via-sky-500/15 to-amber-500/15 border border-cyan-500/40 hover:border-cyan-400 text-cyan-300 hover:text-white transition-all shadow-md flex items-center gap-2 text-xs font-bold cursor-pointer"
+            title="Randomly draw between General and Technical tracks"
+          >
+            <Shuffle className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
+            <span>Random Track Draw</span>
+          </button>
+
+          {onOpenEvaluator && (
+            <button
+              onClick={onOpenEvaluator}
+              id="category-evaluator-btn"
+              className="px-3.5 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/30 hover:border-amber-400/60 text-amber-300 hover:text-amber-200 transition-all shadow-md flex items-center gap-2 text-xs font-bold cursor-pointer"
+              title="Best Speaker Evaluation Rubric (7 Criteria)"
+            >
+              <Trophy className="w-4 h-4 text-amber-400" />
+              <span className="hidden sm:inline">Best Speaker Rubric</span>
+            </button>
+          )}
+
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-slate-400 bg-slate-900/60 px-3.5 py-1.5 rounded-full border border-slate-800">
+            <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+            <span className="hidden md:inline">Track Selection Phase</span>
+          </div>
         </div>
       </header>
 
       {/* Main Content Area */}
-      <main className="relative z-10 flex-1 flex flex-col items-center justify-center max-w-5xl mx-auto px-4 py-8 w-full">
+      <main className="relative z-10 flex-1 flex flex-col items-center justify-center max-w-5xl mx-auto px-4 py-6 w-full">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="text-center mb-10 max-w-2xl"
+          className="text-center mb-8 max-w-2xl"
         >
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/70 border border-cyan-500/30 text-cyan-300 text-xs font-bold tracking-widest uppercase mb-3">
             <Layers className="w-3.5 h-3.5" />
@@ -62,9 +98,22 @@ export function CategorySelect({
             CHOOSE YOUR <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-300 to-amber-400">CATEGORY</span>
           </h2>
           
-          <p className="mt-3 text-slate-400 text-sm sm:text-base">
-            Select your preferred debate track to unlock the 20 numbered secret motion slots.
+          <p className="mt-2 text-slate-400 text-sm sm:text-base">
+            Select your preferred debate track or use Random Draw to let fate decide between General & Technical.
           </p>
+
+          {/* Prominent Center Random Draw Action Bar */}
+          <div className="mt-5 flex items-center justify-center">
+            <button
+              onClick={handleOpenRandomDraw}
+              id="main-random-category-btn"
+              className="inline-flex items-center gap-2.5 px-6 py-2.5 rounded-full bg-gradient-to-r from-cyan-950/90 via-slate-900/90 to-amber-950/90 hover:from-cyan-900 hover:to-amber-900 border-2 border-cyan-500/40 hover:border-amber-400 text-slate-200 hover:text-white transition-all shadow-lg hover:shadow-cyan-500/20 text-xs font-extrabold tracking-wider uppercase cursor-pointer transform hover:scale-103 active:scale-97"
+            >
+              <Shuffle className="w-4 h-4 text-amber-400 animate-pulse" />
+              <span>🎲 Random Draw: General vs Technical</span>
+              <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+            </button>
+          </div>
         </motion.div>
 
         {/* Dual Category Cards */}
@@ -199,8 +248,18 @@ export function CategorySelect({
 
       {/* Footer Info */}
       <footer className="relative z-10 w-full text-center py-4 border-t border-slate-900/80 text-xs text-slate-500">
-        Click any category above to access its 20 debate topic cards
+        Click any category above or use Random Draw to access the 20 debate topic cards
       </footer>
+
+      {/* Random Category Roulette / Draw Modal */}
+      <CategoryRandomDrawModal
+        isOpen={isRandomDrawOpen}
+        onClose={() => setIsRandomDrawOpen(false)}
+        onSelectCategory={(chosen) => {
+          setIsRandomDrawOpen(false);
+          handleSelect(chosen);
+        }}
+      />
     </div>
   );
 }

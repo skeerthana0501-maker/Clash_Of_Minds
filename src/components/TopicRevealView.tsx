@@ -14,7 +14,8 @@ import {
   ChevronLeft, 
   ChevronRight, 
   Share2,
-  Edit2
+  Edit2,
+  Trophy
 } from 'lucide-react';
 import { DebateTopic, CategoryType } from '../types';
 import { soundManager } from '../utils/audio';
@@ -29,6 +30,7 @@ interface TopicRevealViewProps {
   onSelectTopic: (topic: DebateTopic) => void;
   onToggleUsed: (topicId: string) => void;
   onUpdateTopicMotion: (topicId: string, newMotion: string) => void;
+  onOpenEvaluator?: () => void;
 }
 
 export function TopicRevealView({
@@ -39,6 +41,7 @@ export function TopicRevealView({
   onSelectTopic,
   onToggleUsed,
   onUpdateTopicMotion,
+  onOpenEvaluator,
 }: TopicRevealViewProps) {
   const [copied, setCopied] = useState(false);
   const [showCoinToss, setShowCoinToss] = useState(false);
@@ -153,6 +156,18 @@ export function TopicRevealView({
 
         {/* Quick Side Allocation & Copy Actions */}
         <div className="flex items-center gap-2">
+          {onOpenEvaluator && (
+            <button
+              onClick={onOpenEvaluator}
+              id="reveal-evaluator-btn"
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 hover:border-amber-400/50 text-amber-300 text-xs font-bold transition cursor-pointer shadow-sm"
+              title="Evaluate Best Speaker (7 Criteria)"
+            >
+              <Trophy className="w-3.5 h-3.5 text-amber-400" />
+              <span className="hidden sm:inline">Score Speaker</span>
+            </button>
+          )}
+
           <button
             onClick={() => setShowCoinToss(true)}
             id="open-coin-toss-btn"

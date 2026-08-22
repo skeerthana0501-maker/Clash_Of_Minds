@@ -11,10 +11,13 @@ import {
   Lock, 
   CheckCircle2, 
   ChevronRight,
-  HelpCircle
+  HelpCircle,
+  Trophy,
+  Dices
 } from 'lucide-react';
 import { CategoryType, DebateTopic } from '../types';
 import { soundManager } from '../utils/audio';
+import { CategoryRandomDrawModal } from './CategoryRandomDrawModal';
 
 interface TopicGridProps {
   category: CategoryType;
@@ -24,6 +27,7 @@ interface TopicGridProps {
   onSwitchCategory: (cat: CategoryType) => void;
   onOpenEditor: () => void;
   onResetUsed: () => void;
+  onOpenEvaluator?: () => void;
 }
 
 export function TopicGrid({
@@ -34,9 +38,11 @@ export function TopicGrid({
   onSwitchCategory,
   onOpenEditor,
   onResetUsed,
+  onOpenEvaluator,
 }: TopicGridProps) {
   const [isShuffling, setIsShuffling] = useState(false);
   const [highlightedNumber, setHighlightedNumber] = useState<number | null>(null);
+  const [isRandomTrackDrawOpen, setIsRandomTrackDrawOpen] = useState(false);
 
   const isGeneral = category === 'general';
   const categoryTitle = isGeneral ? 'General Debate Track' : 'Technical Debate Track';
@@ -118,8 +124,8 @@ export function TopicGrid({
 
         {/* Action Controls: Switch Track, Random Pick, Edit, Reset */}
         <div className="flex items-center flex-wrap gap-2">
-          {/* Quick Track Switcher */}
-          <div className="inline-flex rounded-xl bg-slate-900/90 p-1 border border-slate-800 text-xs font-semibold">
+          {/* Quick Track Switcher + Random Track Draw */}
+          <div className="inline-flex items-center rounded-xl bg-slate-900/90 p-1 border border-slate-800 text-xs font-semibold gap-1">
             <button
               onClick={() => onSwitchCategory('general')}
               id="switch-general-track-btn"
@@ -142,6 +148,17 @@ export function TopicGrid({
             >
               Technical (20)
             </button>
+            <button
+              onClick={() => {
+                soundManager.playClick();
+                setIsRandomTrackDrawOpen(true);
+              }}
+              id="random-switch-track-btn"
+              className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-cyan-300 transition cursor-pointer"
+              title="Randomly draw track (General vs Technical)"
+            >
+              <Dices className="w-4 h-4 text-cyan-400 animate-pulse" />
+            </button>
           </div>
 
           {/* Random Draw Button */}
@@ -155,6 +172,19 @@ export function TopicGrid({
             <Shuffle className={`w-3.5 h-3.5 ${isShuffling ? 'animate-spin text-cyan-400' : ''}`} />
             <span className="hidden sm:inline">Random Draw</span>
           </button>
+
+          {/* Best Speaker Rubric & Leaderboard */}
+          {onOpenEvaluator && (
+            <button
+              onClick={onOpenEvaluator}
+              id="grid-evaluator-btn"
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 hover:border-amber-400/50 text-amber-300 text-xs font-bold transition-all cursor-pointer shadow-sm"
+              title="Best Speaker Evaluation Rubric & Championship Leaderboard"
+            >
+              <Trophy className="w-3.5 h-3.5 text-amber-400" />
+              <span className="hidden lg:inline">Best Speaker Rubric</span>
+            </button>
+          )}
 
           {/* Custom Topics Editor */}
           <button
@@ -282,6 +312,16 @@ export function TopicGrid({
       <footer className="relative z-10 w-full text-center py-4 border-t border-slate-900/80 text-xs text-slate-500">
         Clash of Minds Debate • {categoryTitle}
       </footer>
+
+      {/* Random Category Draw Modal */}
+      <CategoryRandomDrawModal
+        isOpen={isRandomTrackDrawOpen}
+        onClose={() => setIsRandomTrackDrawOpen(false)}
+        onSelectCategory={(chosen) => {
+          setIsRandomTrackDrawOpen(false);
+          onSwitchCategory(chosen);
+        }}
+      />
     </div>
   );
 }

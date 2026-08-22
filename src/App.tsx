@@ -19,6 +19,7 @@ import { CategorySelect } from './components/CategorySelect';
 import { TopicGrid } from './components/TopicGrid';
 import { TopicRevealView } from './components/TopicRevealView';
 import { TopicEditorModal } from './components/TopicEditorModal';
+import { EvaluationModal } from './components/EvaluationModal';
 
 export default function App() {
   const [screen, setScreen] = useState<ScreenState>('intro');
@@ -38,6 +39,7 @@ export default function App() {
 
   const [isMuted, setIsMuted] = useState(false);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
+  const [isEvaluatorOpen, setIsEvaluatorOpen] = useState(false);
 
   // Sync to local storage on changes
   useEffect(() => {
@@ -156,6 +158,8 @@ export default function App() {
               onEnter={handleEnterFromIntro}
               isMuted={isMuted}
               onToggleMute={handleToggleMute}
+              onOpenEvaluator={() => setIsEvaluatorOpen(true)}
+              onRandomTrackSelect={handleSelectCategory}
             />
           </motion.div>
         )}
@@ -174,6 +178,7 @@ export default function App() {
               onBack={() => setScreen('intro')}
               generalUsedCount={generalUsedCount}
               technicalUsedCount={technicalUsedCount}
+              onOpenEvaluator={() => setIsEvaluatorOpen(true)}
             />
           </motion.div>
         )}
@@ -195,6 +200,7 @@ export default function App() {
               onSwitchCategory={(cat) => setSelectedCategory(cat)}
               onOpenEditor={() => setIsEditorOpen(true)}
               onResetUsed={handleResetUsedForCurrentCategory}
+              onOpenEvaluator={() => setIsEvaluatorOpen(true)}
             />
           </motion.div>
         )}
@@ -216,6 +222,7 @@ export default function App() {
               onSelectTopic={(t) => setSelectedTopic(t)}
               onToggleUsed={handleToggleTopicUsed}
               onUpdateTopicMotion={handleUpdateTopicMotion}
+              onOpenEvaluator={() => setIsEvaluatorOpen(true)}
             />
           </motion.div>
         )}
@@ -229,6 +236,13 @@ export default function App() {
         technicalTopics={technicalTopics}
         onSaveTopics={handleSaveEditorTopics}
         onResetDefaults={handleResetDefaults}
+      />
+
+      {/* Best Speaker 7-Criteria Adjudication Modal & Leaderboard */}
+      <EvaluationModal
+        isOpen={isEvaluatorOpen}
+        onClose={() => setIsEvaluatorOpen(false)}
+        defaultTopicMotion={selectedTopic?.motion}
       />
     </div>
   );

@@ -1,6 +1,6 @@
 {
   "name": "Clash of Minds",
-  "description": "Debate event platform with animated intro, General and Technical tracks, numbered topic selector, and stage timer.",
+  "description": "Debate event platform with animated intro, 20 General and 20 Technical tracks, random track draw lottery, numbered motion selector, stage timer, coin toss, and 7-criteria Best Speaker evaluation adjudication system.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
